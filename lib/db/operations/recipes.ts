@@ -107,12 +107,12 @@ export async function updateRecipe(
   return result.rows[0];
 }
 
-export async function deleteRecipe(id: string, userId: string): Promise<void> {
+export async function deleteRecipe(recipeId: string, userId: string): Promise<void> {
   const query = `
     DELETE FROM recipes 
     WHERE id = $1 AND user_id = $2
   `;
-  await pool.query(query, [id, userId]);
+  await pool.query(query, [recipeId, userId]);
   console.log('simulating deleting ingredients');
 }
 
