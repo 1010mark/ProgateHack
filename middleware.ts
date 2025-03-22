@@ -1,7 +1,8 @@
 import { withAuth } from 'next-auth/middleware';
 
 const middleware =
-  process.env.NODE_ENV === 'development'
+  // process.env.NODE_ENV === 'development'
+  false
     ? () => null
     : withAuth({
         pages: {
