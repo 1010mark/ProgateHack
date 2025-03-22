@@ -4,10 +4,16 @@ import {
   getRecipeIngredients,
   deleteRecipe,
 } from '@/lib/db/operations/recipes';
-
-const session = { user: { id: 'dummy-user-id' } };
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
 export async function GET({ params }: { params: { recipeId: string } }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const recipe = await getRecipeById(params.recipeId);
 
@@ -29,6 +35,12 @@ export async function POST(
   request: Request,
   { params }: { params: { recipeId: string } }
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     // レシピIDから使用食材を取得
     const ingredients = await getRecipeIngredients(params.recipeId);
@@ -71,11 +83,11 @@ export async function DELETE(
   request: Request,
   { params }: { params: { recipeId: string } }
 ) {
-  // const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
-  // if (!session || !session.user) {
-  //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  // }
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   try {
     await deleteRecipe(params.recipeId, session.user.id);
