@@ -48,7 +48,7 @@ export async function POST(request: Request) {
             ? descriptionLines.substring(0, 100) + '...' 
             : descriptionLines;
           
-          console.log('Generated recipe:', content);
+          // console.log('Generated recipe:', content);
         //   await updateRecipe({
         //     ...savedRecipe,
         //     status: '完了',
