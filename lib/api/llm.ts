@@ -1,34 +1,52 @@
+import {
+  BedrockAgentRuntimeClient,
+  InvokeAgentCommand,
+} from '@aws-sdk/client-bedrock-agent-runtime';
+
 import { RecipeSuggestionRequest } from '@/types/recipes';
 import { getRecipeIngredients } from '@/lib/db/operations/recipes';
+
+const initializeAWSClient = () => {
+  const region = process.env.NEXT_PUBLIC_AWS_REGION || 'ap-northeast-1';
+  const credentials = {
+    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY as string,
+    sessionToken: process.env.NEXT_PUBLIC_AWS_SESSION_TOKEN as string,
+  };
+  return new BedrockAgentRuntimeClient({
+    region: region,
+    credentials: credentials,
+  });
+};
 
 // LLMとの通信を行うための共通関数
 async function callLLM(prompt: string): Promise<string> {
   try {
-    // TODO: LLM APIとの通信を実装
-    // 例：
-    /*
-    const response = await fetch('https://your-llm-api-endpoint', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.LLM_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "your-model-name",
-        prompt: prompt,
-        max_tokens: 1500,
-        temperature: 0.7
-      })
+    const client = initializeAWSClient();
+    const sessionId = Date.now().toString();
+    const command = new InvokeAgentCommand({
+      agentId: process.env.NEXT_PUBLIC_AWS_AGENTID,
+      agentAliasId: process.env.NEXT_PUBLIC_AWS_AGENT_ALIASID,
+      sessionId,
+      inputText: prompt,
     });
 
-    const data = await response.json();
-    return data.output || data.text || data.content;
-    */
+    // ベドロックエージェントの呼び出し
+    const response = await client.send(command);
+    let completion = '';
 
+    if (response.completion) {
+      for await (const chunkEvent of response.completion) {
+        const chunk = chunkEvent.chunk;
+        if (chunk !== undefined) {
+          const decodedResponse = new TextDecoder('utf-8').decode(chunk.bytes);
+          completion += decodedResponse;
+        }
+      }
+    }
+    console.log('LLM response:', completion);
     // ダミー実装（実際のAPIに置き換えてください）
-    return `# ${
-      prompt.split('\n')[0]
-    }\n\n## 材料（2人前）\n\n- 材料1\n- 材料2\n- 材料3\n\n## 作り方\n\n1. 手順1\n2. 手順2\n3. 手順3\n`;
+    return completion;
   } catch (error) {
     console.error('LLM API call failed:', error);
     throw error;
@@ -42,9 +60,8 @@ export async function generateRecipeSuggestions(
   suggestion: RecipeSuggestionRequest,
   recipeId: string
 ): Promise<string> {
-  // 食材情報を取得
-  const ingredients = await getRecipeIngredients(recipeId);
-  const ingredientNames = ingredients.map((item) => item.name);
+
+  const ingredientNames = suggestion.ingredients.map((item) => item.name);
 
   // LLM用のプロンプトを構築
   const prompt = `
@@ -84,7 +101,7 @@ ${ingredientNames.join('\n')}
 ## ポイント
 - 調理のコツや注意点
 `.trim();
-
+  console.log('LLM prompt:', prompt);
   // LLMサービスを呼び出してレシピを生成
   const generatedContent = await callLLM(prompt);
   console.log('Generated recipe:', generatedContent);
