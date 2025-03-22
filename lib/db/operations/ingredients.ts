@@ -2,36 +2,46 @@ import { pool } from '../index';
 import { Ingredient } from '@/types/ingredients';
 
 const dummyData = [] as Ingredient[];
+const userId = 'dummy-user-id';
 
-for (let i = 0; i < 10; i++) {
-  dummyData.push({
-    id: i + '',
-    name: `トマト+${i}`,
+[
+  {
+    id: '1',
+    name: 'トマト',
     quantity: 1,
     unit: '個',
-    expirationDate: new Date('2022-12-31'),
+    expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2), // 2日後
     createdAt: new Date(),
     updatedAt: new Date(),
     category: '野菜',
     status: 'active',
-    userId: 'dummy-user-id',
-  });
-}
-
-for (let i = 10; i < 20; i++) {
-  dummyData.push({
-    id: i + '',
-    name: `牛肉${i}`,
-    quantity: 1,
-    unit: '個',
-    expirationDate: new Date('2022-12-31'),
+    userId: userId,
+  },
+  {
+    id: '2',
+    name: 'キュウリ',
+    quantity: 2,
+    unit: '本',
+    expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1日後
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    category: '野菜',
+    status: 'active',
+    userId: userId,
+  },
+  {
+    id: '11',
+    name: '豚肉',
+    quantity: 300,
+    unit: 'g',
+    expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 12), // 12時間後
     createdAt: new Date(),
     updatedAt: new Date(),
     category: '肉',
     status: 'active',
-    userId: 'dummy-user-id',
-  });
-}
+    userId: userId,
+  },
+].forEach((item) => dummyData.push(item as Ingredient));
 
 export async function getIngredients(userId: string): Promise<Ingredient[]> {
   const query = `

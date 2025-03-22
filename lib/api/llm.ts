@@ -44,7 +44,7 @@ async function callLLM(prompt: string): Promise<string> {
         }
       }
     }
-    console.log('LLM response:', completion);
+    // console.log('LLM response:', completion);
     // ダミー実装（実際のAPIに置き換えてください）
     return completion;
   } catch (error) {
@@ -61,7 +61,9 @@ export async function generateRecipeSuggestions(
   recipeId: string
 ): Promise<string> {
 
-  const ingredientNames = suggestion.ingredients.map((item) => item.name);
+  const ingredientLines = suggestion.ingredients.map(
+    (item) => `- ${item.name}：${item.quantity}${item.unit}`
+  );
 
   // LLM用のプロンプトを構築
   const prompt = `
@@ -82,8 +84,8 @@ ${
     : ''
 }
 
-【使用する食材】
-${ingredientNames.join('\n')}
+【使用できる食材】
+${ingredientLines.join('\n')}
 
 以下の形式でマークダウン形式のレシピを作成してください：
 # レシピ名
