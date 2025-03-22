@@ -9,7 +9,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     // Keycloakのログインページに直接誘導
-    signIn('keycloak', { callbackUrl: '/user' });
+    signIn('keycloak', { callbackUrl: '/user/dashboard' });
   }, [router]);
 
   return (
