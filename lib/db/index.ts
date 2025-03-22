@@ -1,4 +1,9 @@
 import { Pool } from 'pg';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// SSL証明書のパスを設定
+const sslCertPath = join(process.cwd(), 'certs', 'global-bundle.pem');
 
 const settings = {
   host: process.env.DB_HOST,
@@ -8,6 +13,7 @@ const settings = {
   password: process.env.DB_PASSWORD,
   ssl: true,
   extra: {
+    ca: readFileSync(sslCertPath).toString(),
     ssl: { rejectUnauthorized: false } 
   }
 };
