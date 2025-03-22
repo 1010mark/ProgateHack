@@ -1,8 +1,6 @@
 import { Pool } from 'pg';
 
-// DB接続プールの作成
-// TODO: 環境変数をちゃんと設定するなりAWSの環境を構築するなりする
-export const pool = new Pool({
+const settings = {
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   database: process.env.DB_NAME,
@@ -12,10 +10,14 @@ export const pool = new Pool({
   extra: {
     ssl: { rejectUnauthorized: false } 
   }
-});
+};
+// DB接続プールの作成
+// TODO: 環境変数をちゃんと設定するなりAWSの環境を構築するなりする
+export const pool = new Pool(settings);
 
 // 接続テスト
 pool.connect((err: Error | undefined, client, release) => {
+  console.log('settings', settings);
   if (err) {
     console.error('Error connecting to the database:', err);
     return;
