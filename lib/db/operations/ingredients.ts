@@ -41,7 +41,7 @@ const userId = 'dummy-user-id';
     status: 'active',
     userId: userId,
   },
-].forEach((item) => dummyData.push(item));
+].forEach((item) => dummyData.push(item as Ingredient));
 
 export async function getIngredients(userId: string): Promise<Ingredient[]> {
   const query = `
