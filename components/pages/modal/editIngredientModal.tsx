@@ -1,19 +1,22 @@
 'use client';
 import { useState } from 'react';
 import { ModalContainer } from '@/components/atom/modalContainer';
-import { AddNewIngredientForm } from '@/components/molecule/addNewIngredientModal/addNewIngredientForm';
-import { addIngredient } from '@/lib/api/ingredients';
-import { Unit, IngredientCategory } from '@/types/ingredients';
+import { EditIngredientForm } from '@/components/molecule/addNewIngredientModal/editIngredientForm';
+import { updateIngredientApi } from '@/lib/api/ingredients';
+import { Unit, IngredientCategory, Ingredient } from '@/types/ingredients';
 
-interface AddNewIngredientModalProps {
+interface EditIngredientModalProps {
+  ingredient: Ingredient;
+  isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
-export const AddNewIngredientModal = ({
+export const EditIngredientModal = ({
+  ingredient,
   onClose,
   onSuccess,
-}: AddNewIngredientModalProps) => {
+}: EditIngredientModalProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,6 +24,7 @@ export const AddNewIngredientModal = ({
     try {
       setLoading(true);
       const newIngredient = {
+        ...ingredient,
         name: formData.name,
         category: formData.category as IngredientCategory,
         quantity: formData.quantity,
@@ -31,14 +35,14 @@ export const AddNewIngredientModal = ({
         updatedAt: new Date(),
       };
 
-      await addIngredient(newIngredient);
+      await updateIngredientApi(newIngredient);
       if (onSuccess) {
         onSuccess();
       } else {
         onClose();
       }
     } catch (err) {
-      setError('食材の追加に失敗しました');
+      setError('食材の編集に失敗しました');
       console.error(err);
       setLoading(false);
     }
@@ -46,13 +50,15 @@ export const AddNewIngredientModal = ({
 
   return (
     <ModalContainer onClose={onClose}>
-      <h2 className='text-2xl font-bold mb-4'>新しい食材を追加</h2>
-      <div className='border-t mx-3 my-2'></div>
-      <AddNewIngredientForm
-        onSubmit={handleSubmit}
-        loading={loading}
-        error={error}
-      />
+      <h2 className='text-2xl font-bold mb-4'>食材情報を編集</h2>
+      <div className='border-t mx-3 my-2'>
+        <EditIngredientForm
+          onSubmit={handleSubmit}
+          loading={loading}
+          error={error}
+          ingredient={ingredient}
+        />
+      </div>
     </ModalContainer>
   );
 };
