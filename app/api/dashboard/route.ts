@@ -6,18 +6,17 @@ import {
   getPopularIngredients,
   getCategoryDistribution,
 } from '@/lib/db/operations/dashboard';
-// import { getServerSession } from 'next-auth/next';
-// import { authOptions } from '@/lib/auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
-const session = { user: { id: 'test' } };
 
 // ダッシュボードデータの取得
 export async function GET(request: Request) {
-  // const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
-  // if (!session || !session.user) {
-  //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  // }
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   try {
     const userId = session.user.id;

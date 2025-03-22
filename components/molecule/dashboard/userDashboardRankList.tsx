@@ -45,6 +45,20 @@ export default function UserDashboardRankList() {
     );
   }
 
+  // データが空の場合の表示
+  if (rankData.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>よく使われる食材</CardTitle>
+        </CardHeader>
+        <CardContent className='flex justify-center'>
+          <p>現在使用した食材はありません～</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   // エラー発生時の表示
   if (error) {
     return (

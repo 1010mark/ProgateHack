@@ -154,7 +154,6 @@ export async function updateStatistics(userId: string): Promise<Statistics> {
  * @returns 日付ごとの食材使用回数の配列
  */
 export async function getUsageTrends(userId: string): Promise<UsageTrend[]> {
-  // 実際のデータベースクエリバージョン
   const query = `
     SELECT DATE_TRUNC('day', used_at) AS date, COUNT(*) AS usage_count
     FROM user_ingredients
@@ -166,36 +165,28 @@ export async function getUsageTrends(userId: string): Promise<UsageTrend[]> {
   `;
   
   const result = await pool.query(query, [userId]);
-  return result.rows.map((row: any) => ({
+  const trends: UsageTrend[] = result.rows.map((row: any) => ({
     date: row.date,
     usageCount: parseInt(row.usage_count),
   }));
 
-  // シミュレーションバージョン
-  console.log('食材使用トレンドを取得中:', userId);
-
-  // 過去30日間のダミーデータを生成
-  const trends: UsageTrend[] = [];
+  // Get the last 30 days
   const today = new Date();
+  const last30Days = Array.from({ length: 30 }, (_, i) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - (30 - i)); // Last 30 days
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+  });
 
-  for (let i = 30; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(today.getDate() - i);
-    date.setHours(0, 0, 0, 0);
+  // Fill missing days with zero usageCount
+  const filledTrends: UsageTrend[] = last30Days.map((date) => {
+    const existingTrend = trends.find((trend) => trend.date === date);
+    return existingTrend ? existingTrend : { date, usageCount: 0 };
+  });
 
-    const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
-
-    const usageCount = Math.floor(Math.random() * 6);
-
-    trends.push({
-      date: formattedDate,
-      usageCount: usageCount,
-    });
-  }
-
-  console.log('トレンドデータ:', trends);
-  return trends;
+  return filledTrends;
 }
+
 
 /**
  * よく使われる食材のランキングを取得する

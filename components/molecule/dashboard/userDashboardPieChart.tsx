@@ -53,10 +53,24 @@ export default function UserDashboardPieChart() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>カテゴリー別割合分析</CardTitle>
+          <CardTitle>現在の食材のカテゴリ別分析</CardTitle>
         </CardHeader>
         <CardContent className='h-64 flex items-center justify-center'>
           <p>データを読み込み中...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // データが空の場合の表示
+  if (pieData.length === 0) {
+    return (
+      <Card className='w-full'>
+        <CardHeader>
+          <CardTitle>現在の食材のカテゴリ別分析</CardTitle>
+        </CardHeader>
+        <CardContent className='h-64 flex items-center justify-center'>
+          <p>まだ食材は追加されていません～</p>
         </CardContent>
       </Card>
     );
@@ -67,7 +81,7 @@ export default function UserDashboardPieChart() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>カテゴリー別割合分析</CardTitle>
+          <CardTitle>現在の食材のカテゴリ別分析</CardTitle>
         </CardHeader>
         <CardContent className='h-64 flex items-center justify-center'>
           <p className='text-red-500'>{error}</p>
@@ -79,7 +93,7 @@ export default function UserDashboardPieChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>カテゴリー別割合分析</CardTitle>
+        <CardTitle>現在の食材のカテゴリ別分析</CardTitle>
       </CardHeader>
       <CardContent className='h-64'>
         <PieResponsiveContainer width='100%' height='100%'>
