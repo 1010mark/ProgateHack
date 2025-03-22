@@ -2,61 +2,27 @@ import { pool } from '../index';
 import { Recipe } from '@/types/recipes';
 import { Ingredient } from '@/types/ingredients';
 
-const mockRecipes: Recipe[] = [
-  {
-    id: '1',
-    userId: 'dummy-user-id',
-    recipesName: '和食レシピ',
-    ingredients: ['1', '2'],
-    status: '完了',
-    description: '2人分の和食レシピ',
-    content:
-      '# 和食レシピ\n\n## 材料\n- 米 2合\n- 味噌 大さじ2\n\n## 手順\n1. 米を研ぐ\n2. 炊く\n3. 味噌汁を作る',
-    createdAt: new Date(),
-  },
-  {
-    id: '2',
-    userId: 'dummy-user-id',
-    recipesName: '中華レシピ',
-    ingredients: ['1', '2'],
-    status: '作成中',
-    description: '4人分の中華レシピを生成中...',
-    content: '',
-    createdAt: new Date(),
-  },
-  {
-    id: '3',
-    userId: 'dummy-user-id',
-    recipesName: 'イタリアン',
-    ingredients: ['1', '2'],
-    status: '失敗',
-    description: 'レシピの生成に失敗しました。',
-    content: '',
-    createdAt: new Date(),
-  },
-];
-
 export async function getRecipes(userId: string): Promise<Recipe[]> {
-  // const query = `
-  //   SELECT
-  //     id,
-  //     recipes_name as "recipesName",
-  //     people_count as "peopleCount",
-  //     meal_preference as "mealPreference",
-  //     cooking_time as "cookingTime",
-  //     allergies,
-  //     other_conditions as "otherConditions",
-  //     status,
-  //     description,
-  //     content,
-  //     created_at as "createdAt"
-  //   FROM recipes
-  //   WHERE user_id = $1
-  //   ORDER BY created_at DESC
-  // `;
-  // const result = await pool.query(query, [userId]);
-  // return result.rows;
-  return mockRecipes.filter((recipe) => recipe.userId === userId);
+  const query = `
+    SELECT
+      id,
+      recipes_name as "recipesName",
+      people_count as "peopleCount",
+      meal_preference as "mealPreference",
+      cooking_time as "cookingTime",
+      allergies,
+      other_conditions as "otherConditions",
+      status,
+      description,
+      content,
+      created_at as "createdAt"
+    FROM recipes
+    WHERE user_id = $1
+    ORDER BY created_at DESC
+  `;
+  const result = await pool.query(query, [userId]);
+  return result.rows;
+  // return mockRecipes.filter((recipe) => recipe.userId === userId);
 }
 
 export async function saveRecipe(recipe: Recipe): Promise<Recipe> {
@@ -142,11 +108,11 @@ export async function updateRecipe(
 }
 
 export async function deleteRecipe(id: string, userId: string): Promise<void> {
-  // const query = `
-  //   DELETE FROM recipes 
-  //   WHERE id = $1 AND user_id = $2
-  // `;
-  // await pool.query(query, [id, userId]);
+  const query = `
+    DELETE FROM recipes 
+    WHERE id = $1 AND user_id = $2
+  `;
+  await pool.query(query, [id, userId]);
   console.log('simulating deleting ingredients');
 }
 

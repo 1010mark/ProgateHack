@@ -39,35 +39,35 @@ const dummyStatistics: Statistics = {
  * @returns 食材総数、期限切れ間近の食材数、レシピ総数を含む統計オブジェクト
  */
 export async function getStatistics(userId: string): Promise<Statistics> {
-  // 実際のデータベースクエリバージョン;
-  // const ingredientsCountQuery = `
-  //   SELECT COUNT(*) AS count FROM user_ingredients
-  //   WHERE user_id = $1 AND status = 'active'
-  // `;
-  //
-  // const expiringIngredientsQuery = `
-  //   SELECT COUNT(*) AS count FROM user_ingredients
-  //   WHERE user_id = $1
-  //   AND expiration_date IS NOT NULL
-  //   AND expiration_date <= NOW() + INTERVAL '3 days'
-  //   AND expiration_date >= CAST(NOW() AS DATE)
-  //   AND status = 'active'
-  // `;
-  //
-  // const recipesCountQuery = `
-  //   SELECT COUNT(*) AS count FROM recipes
-  //   WHERE user_id = $1
-  // `;
-  //
-  // const ingredientsResult = await pool.query(ingredientsCountQuery, [userId]);
-  // const expiringResult = await pool.query(expiringIngredientsQuery, [userId]);
-  // const recipesResult = await pool.query(recipesCountQuery, [userId]);
-  //
-  // return {
-  //   ingredientsCount: parseInt(ingredientsResult.rows[0].count),
-  //   expiringIngredients: parseInt(expiringResult.rows[0].count),
-  //   recipesCount: parseInt(recipesResult.rows[0].count),
-  // };
+  // 実際のデータベースクエリバージョン
+  const ingredientsCountQuery = `
+    SELECT COUNT(*) AS count FROM user_ingredients
+    WHERE user_id = $1 AND status = 'active'
+  `;
+  
+  const expiringIngredientsQuery = `
+    SELECT COUNT(*) AS count FROM user_ingredients
+    WHERE user_id = $1
+    AND expiration_date IS NOT NULL
+    AND expiration_date <= NOW() + INTERVAL '3 days'
+    AND expiration_date >= CAST(NOW() AS DATE)
+    AND status = 'active'
+  `;
+  
+  const recipesCountQuery = `
+    SELECT COUNT(*) AS count FROM recipes
+    WHERE user_id = $1
+  `;
+  
+  const ingredientsResult = await pool.query(ingredientsCountQuery, [userId]);
+  const expiringResult = await pool.query(expiringIngredientsQuery, [userId]);
+  const recipesResult = await pool.query(recipesCountQuery, [userId]);
+  
+  return {
+    ingredientsCount: parseInt(ingredientsResult.rows[0].count),
+    expiringIngredients: parseInt(expiringResult.rows[0].count),
+    recipesCount: parseInt(recipesResult.rows[0].count),
+  };
 
   // シミュレーションバージョン
   console.log('ユーザーの統計情報を取得中:', userId);
@@ -81,18 +81,18 @@ export async function getStatistics(userId: string): Promise<Statistics> {
  */
 export async function getExpiringIngredients(userId: string): Promise<any[]> {
   // 実際のデータベースクエリバージョン
-  // const query = `
-  //   SELECT * FROM user_ingredients
-  //   WHERE user_id = $1
-  //   AND expiration_date IS NOT NULL
-  //   AND expiration_date <= NOW() + INTERVAL '3 days'
-  //   AND expiration_date >= CAST(NOW() AS DATE)
-  //   AND status = 'active'
-  //   ORDER BY expiration_date ASC
-  // `;
-  //
-  // const result = await pool.query(query, [userId]);
-  // return result.rows;
+  const query = `
+    SELECT * FROM user_ingredients
+    WHERE user_id = $1
+    AND expiration_date IS NOT NULL
+    AND expiration_date <= NOW() + INTERVAL '3 days'
+    AND expiration_date >= CAST(NOW() AS DATE)
+    AND status = 'active'
+    ORDER BY expiration_date ASC
+  `;
+  
+  const result = await pool.query(query, [userId]);
+  return result.rows;
 
   // シミュレーションバージョン
   console.log('期限切れ間近の食材を取得中');
@@ -155,21 +155,21 @@ export async function updateStatistics(userId: string): Promise<Statistics> {
  */
 export async function getUsageTrends(userId: string): Promise<UsageTrend[]> {
   // 実際のデータベースクエリバージョン
-  // const query = `
-  //   SELECT DATE_TRUNC('day', used_at) AS date, COUNT(*) AS usage_count
-  //   FROM user_ingredients
-  //   WHERE user_id = $1
-  //   AND used_at >= NOW() - INTERVAL '30 days'
-  //   AND status = 'used'
-  //   GROUP BY DATE_TRUNC('day', used_at)
-  //   ORDER BY date ASC
-  // `;
-  //
-  // const result = await pool.query(query, [userId]);
-  // return result.rows.map((row) => ({
-  //   date: row.date,
-  //   usageCount: parseInt(row.usage_count),
-  // }));
+  const query = `
+    SELECT DATE_TRUNC('day', used_at) AS date, COUNT(*) AS usage_count
+    FROM user_ingredients
+    WHERE user_id = $1
+    AND used_at >= NOW() - INTERVAL '30 days'
+    AND status = 'used'
+    GROUP BY DATE_TRUNC('day', used_at)
+    ORDER BY date ASC
+  `;
+  
+  const result = await pool.query(query, [userId]);
+  return result.rows.map((row: any) => ({
+    date: row.date,
+    usageCount: parseInt(row.usage_count),
+  }));
 
   // シミュレーションバージョン
   console.log('食材使用トレンドを取得中:', userId);
@@ -208,21 +208,21 @@ export async function getPopularIngredients(
   limit: number = 10
 ): Promise<PopularIngredient[]> {
   // 実際のデータベースクエリバージョン
-  // const query = `
-  //   SELECT name, COUNT(*) AS usage_count
-  //   FROM user_ingredients
-  //   WHERE user_id = $1
-  //   AND status = 'used'
-  //   GROUP BY name
-  //   ORDER BY usage_count DESC
-  //   LIMIT $2
-  // `;
-  //
-  // const result = await pool.query(query, [userId, limit]);
-  // return result.rows.map((row) => ({
-  //   name: row.name,
-  //   usageCount: parseInt(row.usage_count),
-  // }));
+  const query = `
+    SELECT name, COUNT(*) AS usage_count
+    FROM user_ingredients
+    WHERE user_id = $1
+    AND status = 'used'
+    GROUP BY name
+    ORDER BY usage_count DESC
+    LIMIT $2
+  `;
+  
+  const result = await pool.query(query, [userId, limit]);
+  return result.rows.map((row: any) => ({
+    name: row.name,
+    usageCount: parseInt(row.usage_count),
+  }));
 
   // シミュレーションバージョン
   console.log('よく使われる食材を取得中:', userId, 'limit:', limit);
@@ -250,19 +250,19 @@ export async function getCategoryDistribution(
   userId: string
 ): Promise<CategoryDistribution[]> {
   // 実際のデータベースクエリバージョン
-  // const query = `
-  //   SELECT COALESCE(category, '他の') AS category, COUNT(*) AS count
-  //   FROM user_ingredients
-  //   WHERE user_id = $1
-  //   AND status = 'active'
-  //   GROUP BY category
-  // `;
-  //
-  // const result = await pool.query(query, [userId]);
-  // return result.rows.map((row) => ({
-  //   category: row.category,
-  //   count: parseInt(row.count),
-  // }));
+  const query = `
+    SELECT COALESCE(category, '他の') AS category, COUNT(*) AS count
+    FROM user_ingredients
+    WHERE user_id = $1
+    AND status = 'active'
+    GROUP BY category
+  `;
+  
+  const result = await pool.query(query, [userId]);
+  return result.rows.map((row: any) => ({
+    category: row.category,
+    count: parseInt(row.count),
+  }));
 
   // シミュレーションバージョン
   console.log('カテゴリー別割合を取得中:', userId);
