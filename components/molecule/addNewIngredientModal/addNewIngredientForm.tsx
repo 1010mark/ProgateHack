@@ -22,14 +22,14 @@ export const AddNewIngredientForm = ({
   const defaultDate = new Date();
   const [formData, setFormData] = useState<Ingredient>({
     id: '',
-    userId: '',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    user_id: '',
+    created_at: new Date(),
+    updated_at: new Date(),
     name: '',
     category: dummyCategoryOptions[0],
     quantity: 1,
     unit: dummyUnitOptions[0],
-    expirationDate: defaultDate,
+    expiration_date: defaultDate,
     notes: '',
   });
 
@@ -92,7 +92,7 @@ export const AddNewIngredientForm = ({
           label='賞味期限'
           placeholder='例: 2022-12-31'
           type='date'
-          value={formData.expirationDate.toISOString().split('T')[0]}
+          value={formData.expiration_date.toISOString().split('T')[0]}
           onChange={(e) => handleChange('expirationDate', e.target.value)}
         />
         <TextInputBox

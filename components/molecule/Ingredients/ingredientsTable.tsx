@@ -143,9 +143,9 @@ export const IngredientsTable = ({ ingredients }: IngredientsTableProps) => {
                 </div>
               </TableCell>
               <TableCell className='w-[25%]'>
-                {ingredient.expirationDate instanceof Date
-                  ? ingredient.expirationDate.toDateString()
-                  : new Date(ingredient.expirationDate).toDateString()}
+                {ingredient.expiration_date instanceof Date
+                  ? ingredient.expiration_date.toDateString()
+                  : new Date(ingredient.expiration_date).toDateString()}
               </TableCell>
             </TableRow>
           ))}

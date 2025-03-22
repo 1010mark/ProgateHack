@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const ingredient: Ingredient = {
       ...body,
-      userId: session.user.id,
+      user_id: session.user.id,
     };
 
     const result = await saveIngredient(ingredient);

@@ -84,8 +84,8 @@ export const EditIngredientForm = ({
           label='賞味期限'
           placeholder='例: 2022-12-31'
           type='date'
-          value={formData.expirationDate}
-          onChange={(e) => handleChange('expirationDate', e.target.value)}
+          value={formData.expiration_date}
+          onChange={(e) => handleChange('expiration_date', e.target.value)}
         />
         <TextInputBox
           label='説明(任意)'

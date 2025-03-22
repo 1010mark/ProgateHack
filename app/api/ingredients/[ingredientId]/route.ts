@@ -26,7 +26,7 @@ export async function PUT(
     const ingredient: Ingredient = {
       ...body,
       id: params.ingredientId,
-      userId: session.user.id,
+      user_id: session.user.id,
     };
 
     const result = await updateIngredient(ingredient);
