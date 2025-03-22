@@ -11,10 +11,10 @@ const settings = {
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  extra: {
-    ca: readFileSync(sslCertPath).toString(),
-    ssl: { rejectUnauthorized: false } 
-  }
+  //extra: {
+  //  ca: readFileSync(sslCertPath).toString(),
+  //  ssl: { rejectUnauthorized: false }
+  //}
 };
 // DB接続プールの作成
 // TODO: 環境変数をちゃんと設定するなりAWSの環境を構築するなりする
