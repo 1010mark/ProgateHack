@@ -1,8 +1,15 @@
+export interface Ingredient {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+}
+
 // レシピ提案のリクエストデータ
 export interface RecipeSuggestionRequest {
   id?: string; // ユニークな識別子（例：UUID）
   userId: string; // ユーザーID
-  ingredients: string[]; // 選択された食材のID配列
+  ingredients: Ingredient[]; // 選択された食材のID配列
   peopleCount?: number; // 人数
   mealPreference?: string; // 料理の好み（例：'和食'）
   cookingTime?: string; // 調理時間（例：'30分以内'）
