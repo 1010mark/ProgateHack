@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { TextInputBox } from './textInputBox';
+import { DateInputBox } from './dateInputBox';
 import { SelectInput } from './selectInput';
 import { Input } from '@/components/ui/input';
 import { Unit, IngredientCategory, Ingredient } from '@/types/ingredients';
@@ -22,18 +23,7 @@ export const EditIngredientForm = ({
   ingredient,
 }: EditIngredientFormProps) => {
   const defaultDate = new Date();
-  const [formData, setFormData] = useState<Ingredient>({
-    id: '',
-    userId: '',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    name: '',
-    category: dummyCategoryOptions[0],
-    quantity: 1,
-    unit: dummyUnitOptions[0],
-    expirationDate: defaultDate,
-    notes: '',
-  } as Ingredient);
+  const [formData, setFormData] = useState<Ingredient>(ingredient);
 
   const handleChange = (field: string, value: string | number | Date) => {
     setFormData({ ...formData, [field]: value });
@@ -90,11 +80,11 @@ export const EditIngredientForm = ({
           value={formData.unit}
           onChange={(value) => handleChange('unit', value)}
         />
-        <TextInputBox
+        <DateInputBox
           label='賞味期限'
           placeholder='例: 2022-12-31'
           type='date'
-          value={formData.expirationDate.toISOString().split('T')[0]}
+          value={formData.expirationDate}
           onChange={(e) => handleChange('expirationDate', e.target.value)}
         />
         <TextInputBox

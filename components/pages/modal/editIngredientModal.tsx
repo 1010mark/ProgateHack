@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { ModalContainer } from '@/components/atom/modalContainer';
 import { EditIngredientForm } from '@/components/molecule/addNewIngredientModal/editIngredientForm';
-import { addIngredient } from '@/lib/api/ingredients';
+import { updateIngredientApi } from '@/lib/api/ingredients';
 import { Unit, IngredientCategory, Ingredient } from '@/types/ingredients';
 
 interface EditIngredientModalProps {
@@ -24,6 +24,7 @@ export const EditIngredientModal = ({
     try {
       setLoading(true);
       const newIngredient = {
+        ...ingredient,
         name: formData.name,
         category: formData.category as IngredientCategory,
         quantity: formData.quantity,
@@ -34,7 +35,7 @@ export const EditIngredientModal = ({
         updatedAt: new Date(),
       };
 
-      await addIngredient(newIngredient);
+      await updateIngredientApi(newIngredient);
       if (onSuccess) {
         onSuccess();
       } else {
