@@ -29,7 +29,7 @@ export const EditIngredientModal = ({
         category: formData.category as IngredientCategory,
         quantity: formData.quantity,
         unit: formData.unit as Unit,
-        expirationDate: new Date(formData.expiration_date),
+        expiration_date: new Date(formData.expiration_date),
         notes: formData.notes || undefined,
         status: 'active' as 'active',
         updatedAt: new Date(),
@@ -38,9 +38,9 @@ export const EditIngredientModal = ({
       await updateIngredientApi(newIngredient);
       if (onSuccess) {
         onSuccess();
-      } else {
-        onClose();
       }
+      window.location.reload();
+      onClose();
     } catch (err) {
       setError('食材の編集に失敗しました');
       console.error(err);

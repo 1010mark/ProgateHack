@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { TextInputBox } from './textInputBox';
+import { DateInputBox } from './DateInputBox';
 import { SelectInput } from './selectInput';
 import { Input } from '@/components/ui/input';
 import { Unit, IngredientCategory, Ingredient } from '@/types/ingredients';
@@ -88,12 +89,12 @@ export const AddNewIngredientForm = ({
           value={formData.unit}
           onChange={(value) => handleChange('unit', value)}
         />
-        <TextInputBox
+        <DateInputBox
           label='賞味期限'
           placeholder='例: 2022-12-31'
           type='date'
-          value={formData.expiration_date.toISOString().split('T')[0]}
-          onChange={(e) => handleChange('expirationDate', e.target.value)}
+          value={formData.expiration_date}
+          onChange={(e) => handleChange('expiration_date', e.target.value)}
         />
         <TextInputBox
           label='説明(任意)'
