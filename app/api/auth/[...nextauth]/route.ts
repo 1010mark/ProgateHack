@@ -5,7 +5,8 @@ import { JWT } from 'next-auth/jwt';
 
 // 開発モードではダミーのセッションを返す
 const handler =
-  process.env.NODE_ENV === 'development'
+  // process.env.NODE_ENV !== 'development'
+  false
     ? async (req: any) => {
         return NextResponse.json({
           user: {
