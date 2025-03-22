@@ -5,20 +5,22 @@ import { SelectInput } from './selectInput';
 import { Input } from '@/components/ui/input';
 import { Unit, IngredientCategory, Ingredient } from '@/types/ingredients';
 
-interface AddNewIngredientFormProps {
+interface EditIngredientFormProps {
   onSubmit: (formData: any) => Promise<void>;
   loading: boolean;
   error: string | null;
+  ingredient: Ingredient;
 }
 
 const dummyUnitOptions: Unit[] = ['個', 'g', 'ml', '束', '本', '枚', 'パック'];
 const dummyCategoryOptions: IngredientCategory[] = ['野菜', '肉', '魚'];
 
-export const AddNewIngredientForm = ({
+export const EditIngredientForm = ({
   onSubmit,
   loading,
   error,
-}: AddNewIngredientFormProps) => {
+  ingredient,
+}: EditIngredientFormProps) => {
   const defaultDate = new Date();
   const [formData, setFormData] = useState<Ingredient>({
     id: '',
@@ -31,7 +33,7 @@ export const AddNewIngredientForm = ({
     unit: dummyUnitOptions[0],
     expirationDate: defaultDate,
     notes: '',
-  });
+  } as Ingredient);
 
   const handleChange = (field: string, value: string | number | Date) => {
     setFormData({ ...formData, [field]: value });
@@ -109,7 +111,7 @@ export const AddNewIngredientForm = ({
           onClick={handleSubmit}
           disabled={loading}
         >
-          {loading ? '処理中...' : '追加'}
+          {loading ? '処理中...' : '編集'}
         </Button>
       </div>
     </>

@@ -14,8 +14,8 @@ import {
 import { cn } from '@/lib/utils';
 import { Ingredient } from '@/types/ingredients';
 import { Checkbox } from '@/components/ui/checkbox';
-
 import { selectedIngredientCartState } from '@/store/selectedIngredientCartState';
+import { EditIngredientModal } from '@/components/pages/modal/editIngredientModal';
 
 interface IngredientsTableProps {
   ingredients: Ingredient[];
@@ -46,9 +46,34 @@ export const IngredientsTable = ({ ingredients }: IngredientsTableProps) => {
   const [selectedIngredients, setSelectedIngredients] = useAtom(
     selectedIngredientCartState
   );
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedIngredient, setSelectedIngredient] =
+    useState<Ingredient | null>(null);
+
+  const handleRowClick = (ingredient: Ingredient) => {
+    setSelectedIngredient(ingredient);
+    setIsOpen(true);
+  };
+
+  const handleIngredientUpdated = () => {
+    // TODO: 必要に応じて更新後の処理を追加
+    setIsOpen(false);
+    setSelectedIngredient(null);
+  };
 
   return (
     <Table className='w-full '>
+      {selectedIngredient && (
+        <EditIngredientModal
+          ingredient={selectedIngredient}
+          isOpen={isOpen}
+          onClose={() => {
+            setIsOpen(false);
+            setSelectedIngredient(null);
+          }}
+          onSuccess={handleIngredientUpdated}
+        />
+      )}
       <TableHeader className='text-center'>
         <TableRow key={'header'}>
           <TableHead className='text-center w-[10%]'>選択</TableHead>
@@ -61,8 +86,17 @@ export const IngredientsTable = ({ ingredients }: IngredientsTableProps) => {
       </TableHeader>
       <TableBody className='text-center w-full'>
         {ingredients.map((ingredient) => (
-          <TableRow key={ingredient.id}>
-            <TableCell className='w-[10%]'>
+          <TableRow
+            key={ingredient.id}
+            onClick={(e) => {
+              // チェックボックスクリック時は編集モーダルを開かない
+              if (!(e.target as HTMLElement).closest('.checkbox-cell')) {
+                handleRowClick(ingredient);
+              }
+            }}
+            className='cursor-pointer hover:bg-gray-50'
+          >
+            <TableCell className='w-[10%] checkbox-cell'>
               <div className='flex items-center justify-center min-w-5 min-h-5'>
                 <Checkbox
                   checked={selectedIngredients.some(
@@ -101,8 +135,8 @@ export const IngredientsTable = ({ ingredients }: IngredientsTableProps) => {
               </div>
             </TableCell>
             <TableCell className='w-[25%]'>
-              {ingredient.expirationDate instanceof Date 
-                ? ingredient.expirationDate.toDateString() 
+              {ingredient.expirationDate instanceof Date
+                ? ingredient.expirationDate.toDateString()
                 : new Date(ingredient.expirationDate).toDateString()}
             </TableCell>
           </TableRow>
