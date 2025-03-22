@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { TextInputBox } from './textInputBox';
-import { DateInputBox } from './dateInputBox';
+import { DateInputBox } from './DateInputBox';
 import { SelectInput } from './selectInput';
 import { Input } from '@/components/ui/input';
 import { Unit, IngredientCategory, Ingredient } from '@/types/ingredients';
