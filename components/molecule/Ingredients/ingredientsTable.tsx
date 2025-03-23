@@ -86,7 +86,7 @@ export const IngredientsTable = ({ ingredients }: IngredientsTableProps) => {
             <TableHead className='text-center w-[10%]'>数量</TableHead>
             <TableHead className='text-center w-[10%]'>単位</TableHead>
             <TableHead className='text-center w-[25%]'>カテゴリ</TableHead>
-            <TableHead className='text-center w-[25%]'>賞味期限</TableHead>
+            <TableHead className='text-center w-[25%]'>消費期限</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className='text-center w-full'>
