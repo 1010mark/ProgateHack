@@ -89,7 +89,7 @@ export async function callLLMwithImage(
           }
         }
       }
-
+      console.log(completion);
       // 応答を配列として解釈
       const parsedArray = parseResponseAsArray(completion);
       if (parsedArray !== null) {
