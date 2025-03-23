@@ -15,7 +15,8 @@ export async function getRecipes(userId: string): Promise<Recipe[]> {
       status,
       description,
       content,
-      created_at as "createdAt"
+      created_at as "createdAt",
+      used as "used"
     FROM recipes
     WHERE user_id = $1
     ORDER BY created_at DESC
@@ -29,8 +30,8 @@ export async function saveRecipe(recipe: Recipe): Promise<Recipe> {
   const query = `
     INSERT INTO recipes 
     (user_id, recipes_name, people_count, meal_preference, cooking_time, 
-     allergies, other_conditions, status, description, content) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+     allergies, other_conditions, status, description, content, used) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
     RETURNING 
       id,
       recipes_name as "recipesName",
@@ -42,7 +43,8 @@ export async function saveRecipe(recipe: Recipe): Promise<Recipe> {
       status,
       description,
       content,
-      created_at as "createdAt"
+      created_at as "createdAt",
+      used
   `;
   const values = [
     recipe.userId,
@@ -55,6 +57,7 @@ export async function saveRecipe(recipe: Recipe): Promise<Recipe> {
     recipe.status,
     recipe.description,
     recipe.content,
+    false, // usedのデフォルト値をfalseに設定
   ];
   const result = await pool.query(query, values);
   return result.rows[0];
@@ -75,8 +78,9 @@ export async function updateRecipe(
       status = $7,
       description = $8,
       content = $9,
+      used = $10,
       updated_at = CURRENT_TIMESTAMP
-    WHERE id = $10 AND user_id = $11
+    WHERE id = $11 AND user_id = $12
     RETURNING 
       id,
       recipes_name as "recipesName",
@@ -88,7 +92,8 @@ export async function updateRecipe(
       status,
       description,
       content,
-      created_at as "createdAt"
+      created_at as "createdAt",
+      used
   `;
   const values = [
     recipe.recipesName,
@@ -100,6 +105,7 @@ export async function updateRecipe(
     recipe.status,
     recipe.description,
     recipe.content,
+    recipe.used, // usedの値を設定
     recipe.id,
     recipe.user_id,
   ];
@@ -107,7 +113,10 @@ export async function updateRecipe(
   return result.rows[0];
 }
 
-export async function deleteRecipe(recipeId: string, userId: string): Promise<void> {
+export async function deleteRecipe(
+  recipeId: string,
+  userId: string
+): Promise<void> {
   const query = `
     DELETE FROM recipes 
     WHERE id = $1 AND user_id = $2
@@ -135,4 +144,16 @@ export async function getRecipeById(recipeId: string): Promise<Recipe | null> {
   const query = 'SELECT * FROM recipes WHERE id = $1';
   const { rows } = await pool.query(query, [recipeId]);
   return rows[0] || null;
+}
+
+export async function updateRecipeUsedStatus(
+  recipeId: string,
+  used: boolean
+): Promise<void> {
+  const query = `
+    UPDATE recipes 
+    SET used = $1, updated_at = CURRENT_TIMESTAMP
+    WHERE id = $2
+  `;
+  await pool.query(query, [used, recipeId]);
 }

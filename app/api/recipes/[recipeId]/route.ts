@@ -3,6 +3,7 @@ import {
   getRecipeById,
   getRecipeIngredients,
   deleteRecipe,
+  updateRecipeUsedStatus,
 } from '@/lib/db/operations/recipes';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
@@ -96,6 +97,41 @@ export async function DELETE(
     console.error('Error deleting recipe:', error);
     return NextResponse.json(
       { error: 'Failed to delete recipe' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: { recipeId: string } }
+) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { used } = await request.json();
+
+    if (typeof used !== 'boolean') {
+      return NextResponse.json(
+        { error: 'Invalid request. "used" field must be a boolean.' },
+        { status: 400 }
+      );
+    }
+
+    await updateRecipeUsedStatus(params.recipeId, used);
+
+    return NextResponse.json({
+      success: true,
+      message: `Recipe marked as ${used ? 'used' : 'not used'}`,
+    });
+  } catch (error) {
+    console.error('Error updating recipe used status:', error);
+    return NextResponse.json(
+      { error: 'Failed to update recipe used status' },
       { status: 500 }
     );
   }
