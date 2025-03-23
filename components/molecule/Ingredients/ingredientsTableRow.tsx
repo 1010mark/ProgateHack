@@ -41,7 +41,7 @@ export const IngredientsTableRow = ({
       <TableCell>{ingredient.quantity}</TableCell>
       <TableCell>{ingredient.unit}</TableCell>
       <TableCell>{ingredient.category}</TableCell>
-      <TableCell>{ingredient.expirationDate.toDateString()}</TableCell>
+      <TableCell>{ingredient.expiration_date.toDateString()}</TableCell>
     </TableRow>
   );
 };

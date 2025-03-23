@@ -86,7 +86,7 @@ export const IngredientsTable = ({ ingredients }: IngredientsTableProps) => {
             <TableHead className='text-center w-[10%]'>数量</TableHead>
             <TableHead className='text-center w-[10%]'>単位</TableHead>
             <TableHead className='text-center w-[25%]'>カテゴリ</TableHead>
-            <TableHead className='text-center w-[25%]'>賞味期限</TableHead>
+            <TableHead className='text-center w-[25%]'>消費期限</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className='text-center w-full'>
@@ -142,10 +142,16 @@ export const IngredientsTable = ({ ingredients }: IngredientsTableProps) => {
                   </div>
                 </div>
               </TableCell>
-              <TableCell className='w-[25%]'>
-                {ingredient.expirationDate instanceof Date
-                  ? ingredient.expirationDate.toDateString()
-                  : new Date(ingredient.expirationDate).toDateString()}
+              <TableCell
+                className={`w-[25%] ${
+                  new Date(ingredient.expiration_date) < new Date()
+                    ? 'text-red-500'
+                    : ''
+                }`}
+              >
+                {ingredient.expiration_date instanceof Date
+                  ? ingredient.expiration_date.toDateString()
+                  : new Date(ingredient.expiration_date).toDateString()}
               </TableCell>
             </TableRow>
           ))}

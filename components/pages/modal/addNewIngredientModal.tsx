@@ -4,7 +4,7 @@ import { ModalContainer } from '@/components/atom/modalContainer';
 import { AddNewIngredientForm } from '@/components/molecule/addNewIngredientModal/addNewIngredientForm';
 import { addIngredient } from '@/lib/api/ingredients';
 import { Unit, IngredientCategory } from '@/types/ingredients';
-
+import { Ingredient } from '@/types/ingredients';
 interface AddNewIngredientModalProps {
   onClose: () => void;
   onSuccess?: () => void;
@@ -17,7 +17,7 @@ export const AddNewIngredientModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: Ingredient) => {
     try {
       setLoading(true);
       const newIngredient = {
@@ -25,10 +25,12 @@ export const AddNewIngredientModal = ({
         category: formData.category as IngredientCategory,
         quantity: formData.quantity,
         unit: formData.unit as Unit,
-        expirationDate: new Date(formData.expirationDate),
+        expiration_date: new Date(formData.expiration_date),
         notes: formData.notes || undefined,
+        user_id: formData.user_id,
         status: 'active' as 'active',
-        updatedAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
       };
 
       await addIngredient(newIngredient);

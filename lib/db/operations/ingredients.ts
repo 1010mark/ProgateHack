@@ -4,45 +4,6 @@ import { Ingredient } from '@/types/ingredients';
 const dummyData = [] as Ingredient[];
 const userId = 'dummy-user-id';
 
-[
-  {
-    id: '1',
-    name: 'トマト',
-    quantity: 1,
-    unit: '個',
-    expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2), // 2日後
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    category: '野菜',
-    status: 'active',
-    userId: userId,
-  },
-  {
-    id: '2',
-    name: 'キュウリ',
-    quantity: 2,
-    unit: '本',
-    expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1日後
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    category: '野菜',
-    status: 'active',
-    userId: userId,
-  },
-  {
-    id: '11',
-    name: '豚肉',
-    quantity: 300,
-    unit: 'g',
-    expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 12), // 12時間後
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    category: '肉',
-    status: 'active',
-    userId: userId,
-  },
-].forEach((item) => dummyData.push(item as Ingredient));
-
 export async function getIngredients(userId: string): Promise<Ingredient[]> {
   const query = `
     SELECT * FROM user_ingredients
@@ -65,15 +26,15 @@ export async function saveIngredient(
     RETURNING *
   `;
   const values = [
-    ingredient.userId,
+    ingredient.user_id,
     ingredient.name,
     ingredient.quantity,
     ingredient.unit,
-    ingredient.expirationDate,
+    ingredient.expiration_date,
     ingredient.category,
     ingredient.notes,
     ingredient.status || 'active',
-    ingredient.usedAt,
+    ingredient.used_at,
   ];
   const result = await pool.query(query, values);
   return result.rows[0];
@@ -106,13 +67,13 @@ export async function updateIngredient(
     ingredient.name,
     ingredient.quantity,
     ingredient.unit,
-    ingredient.expirationDate,
+    ingredient.expiration_date,
     ingredient.category,
     ingredient.notes,
     ingredient.status || 'active',
-    ingredient.usedAt,
+    ingredient.used_at,
     ingredient.id,
-    ingredient.userId,
+    ingredient.user_id,
   ];
   const result = await pool.query(query, values);
   return result.rows[0];
@@ -120,7 +81,7 @@ export async function updateIngredient(
   // シミュレーションバージョン
   console.log('simulating updating ingredient');
   const index = dummyData.findIndex(
-    (item) => item.id === ingredient.id && item.userId === ingredient.userId
+    (item) => item.id === ingredient.id && item.user_id === ingredient.user_id
   );
 
   if (index === -1) {

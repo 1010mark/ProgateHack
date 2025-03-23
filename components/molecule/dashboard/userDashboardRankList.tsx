@@ -16,8 +16,8 @@ export default function UserDashboardRankList() {
     const loadRankData = async () => {
       try {
         setIsLoading(true);
-        // デフォルトで5件の人気食材を取得
-        const data = await fetchPopularIngredients(5);
+        // デフォルトで8件の人気食材を取得
+        const data = await fetchPopularIngredients(8);
         setRankData(data);
         setError(null);
       } catch (err) {
@@ -40,6 +40,20 @@ export default function UserDashboardRankList() {
         </CardHeader>
         <CardContent className='flex justify-center'>
           <p>データを読み込み中...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // データが空の場合の表示
+  if (rankData.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>よく使われる食材</CardTitle>
+        </CardHeader>
+        <CardContent className='flex justify-center'>
+          <p>現在使用した食材はありません～</p>
         </CardContent>
       </Card>
     );

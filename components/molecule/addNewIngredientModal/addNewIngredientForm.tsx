@@ -1,18 +1,17 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { TextInputBox } from './textInputBox';
+import { DateInputBox } from './DateInputBox';
 import { SelectInput } from './selectInput';
 import { Input } from '@/components/ui/input';
 import { Unit, IngredientCategory, Ingredient } from '@/types/ingredients';
+import { UnitOptions, CategoryOptions } from '@/types/ingredientsTypeInstance';
 
 interface AddNewIngredientFormProps {
   onSubmit: (formData: any) => Promise<void>;
   loading: boolean;
   error: string | null;
 }
-
-const dummyUnitOptions: Unit[] = ['個', 'g', 'ml', '束', '本', '枚', 'パック'];
-const dummyCategoryOptions: IngredientCategory[] = ['野菜', '肉', '魚'];
 
 export const AddNewIngredientForm = ({
   onSubmit,
@@ -22,14 +21,14 @@ export const AddNewIngredientForm = ({
   const defaultDate = new Date();
   const [formData, setFormData] = useState<Ingredient>({
     id: '',
-    userId: '',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    user_id: '',
+    created_at: new Date(),
+    updated_at: new Date(),
     name: '',
-    category: dummyCategoryOptions[0],
+    category: CategoryOptions[0],
     quantity: 1,
-    unit: dummyUnitOptions[0],
-    expirationDate: defaultDate,
+    unit: UnitOptions[0],
+    expiration_date: defaultDate,
     notes: '',
   });
 
@@ -67,7 +66,7 @@ export const AddNewIngredientForm = ({
         <SelectInput
           selectTriggerName='カテゴリを選択'
           selectLabelName='カテゴリ'
-          selectItems={dummyCategoryOptions}
+          selectItems={CategoryOptions}
           value={formData.category}
           onChange={(value) => handleChange('category', value)}
         />
@@ -84,16 +83,16 @@ export const AddNewIngredientForm = ({
         <SelectInput
           selectTriggerName='単位を選択'
           selectLabelName='単位'
-          selectItems={dummyUnitOptions}
+          selectItems={UnitOptions}
           value={formData.unit}
           onChange={(value) => handleChange('unit', value)}
         />
-        <TextInputBox
+        <DateInputBox
           label='賞味期限'
           placeholder='例: 2022-12-31'
           type='date'
-          value={formData.expirationDate.toISOString().split('T')[0]}
-          onChange={(e) => handleChange('expirationDate', e.target.value)}
+          value={formData.expiration_date}
+          onChange={(e) => handleChange('expiration_date', e.target.value)}
         />
         <TextInputBox
           label='説明(任意)'

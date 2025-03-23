@@ -1,9 +1,4 @@
-export interface Ingredient {
-  id: string;
-  name: string;
-  quantity: number;
-  unit: string;
-}
+import { Ingredient } from './ingredients';
 
 // レシピ提案のリクエストデータ
 export interface RecipeSuggestionRequest {
@@ -25,4 +20,5 @@ export interface Recipe extends RecipeSuggestionRequest {
   status: '作成中' | '完了' | '失敗'; // レシピの状態
   content?: string; // レシピの詳細内容（Markdown形式）
   createdAt: Date; // 作成日時
+  used: boolean; // 使用済みかどうか
 }

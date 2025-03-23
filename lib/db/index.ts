@@ -12,8 +12,8 @@ const settings = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   extra: {
-    ca: readFileSync(sslCertPath).toString(),
-    ssl: { rejectUnauthorized: false } 
+   ca: readFileSync(sslCertPath).toString(),
+   ssl: { rejectUnauthorized: false }
   }
 };
 // DB接続プールの作成

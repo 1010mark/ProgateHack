@@ -13,20 +13,31 @@ import { fetchUsageTrends } from '@/lib/api/dashboard';
 import type { UsageTrend } from '@/lib/db/operations/dashboard';
 
 export default function UserDashboardTrendChart() {
-  // 使用トレンドデータの状態管理
   const [trendData, setTrendData] = useState<UsageTrend[]>([]);
-  // ローディング状態
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  // エラー状態
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // コンポーネントマウント時にデータを取得
     const loadTrendData = async () => {
       try {
         setIsLoading(true);
         const data = await fetchUsageTrends();
-        setTrendData(data);
+        console.log('data:', data);
+
+        // If the data is empty, fill the chart with zero values for 30 days
+        if (data.length === 0) {
+          const today = new Date();
+          const last30Days = Array.from({ length: 30 }, (_, i) => {
+            const date = new Date(today);
+            date.setDate(today.getDate() - (30 - i));
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+          });
+          const zeroData = last30Days.map((date) => ({ date, usageCount: 0 }));
+          setTrendData(zeroData);
+        } else {
+          setTrendData(data);
+        }
+
         setError(null);
       } catch (err) {
         setError('トレンドデータの読み込みに失敗しました');
@@ -39,7 +50,6 @@ export default function UserDashboardTrendChart() {
     loadTrendData();
   }, []);
 
-  // データ読み込み中の表示
   if (isLoading) {
     return (
       <Card className='w-full'>
@@ -53,7 +63,6 @@ export default function UserDashboardTrendChart() {
     );
   }
 
-  // エラー発生時の表示
   if (error) {
     return (
       <Card className='w-full'>

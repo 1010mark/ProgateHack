@@ -6,11 +6,19 @@ import {
 } from '@/lib/db/operations/recipes';
 import { RecipeSuggestionRequest, Recipe } from '@/types/recipes';
 import { generateRecipeSuggestions } from '@/lib/api/llm';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
 // GET /api/recipes - レシピ一覧の取得
 export async function GET() {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    const recipes = await getRecipes('dummy-user-id');
+    const recipes = await getRecipes(session.user.id);
     return NextResponse.json(recipes);
   } catch (error) {
     console.error('Failed to fetch recipes:', error);
@@ -23,9 +31,15 @@ export async function GET() {
 
 // POST /api/recipes - 新規レシピの作成
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = (await request.json()) as RecipeSuggestionRequest;
-    const userId = 'dummy-user-id';
+    const userId = session.user.id
     // 初期値でレシピを保存
     const initialRecipe = {
       ...body,
@@ -35,8 +49,8 @@ export async function POST(request: Request) {
       userId: userId,
     } as Recipe;
     console.log('initialRecipe:', initialRecipe);
-    const savedRecipe = {id :'123'}
-    // const savedRecipe = await saveRecipe(initialRecipe);
+
+    const savedRecipe = await saveRecipe(initialRecipe);
 
     // バックグラウンドでレシピを生成
     generateRecipeSuggestions(body, savedRecipe.id)
@@ -49,31 +63,31 @@ export async function POST(request: Request) {
             : descriptionLines;
           
           // console.log('Generated recipe:', content);
-        //   await updateRecipe({
-        //     ...savedRecipe,
-        //     status: '完了',
-        //     description: description,
-        //     content: content,
-        //     userId: userId,
-        //   });
-        // } else {
-        //   await updateRecipe({
-        //     ...savedRecipe,
-        //     status: '失敗',
-        //     description: 'レシピの生成に失敗しました。',
-        //     content: '',
-        //     userId: userId,
-        //   });
+          await updateRecipe({
+            ...savedRecipe,
+            status: '完了',
+            description: description,
+            content: content,
+            user_id: userId,
+          });
+        } else {
+          await updateRecipe({
+            ...savedRecipe,
+            status: '失敗',
+            description: 'レシピの生成に失敗しました。',
+            content: '',
+            user_id: userId,
+          });
         }
       })
       .catch(async (error) => {
         console.error('Failed to generate recipe:', error);
-        // await updateRecipe({
-        //   ...savedRecipe,
-        //   status: '失敗' as const,
-        //   description: 'レシピの生成中にエラーが発生しました。',
-        //   userId: body.userId,
-        // });
+        await updateRecipe({
+          ...savedRecipe,
+          status: '失敗' as const,
+          description: 'レシピの生成中にエラーが発生しました。',
+          user_id: body.userId,
+        });
       });
 
     return NextResponse.json({ id: savedRecipe.id });

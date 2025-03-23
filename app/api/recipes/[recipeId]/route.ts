@@ -3,11 +3,18 @@ import {
   getRecipeById,
   getRecipeIngredients,
   deleteRecipe,
+  updateRecipeUsedStatus,
 } from '@/lib/db/operations/recipes';
-
-const session = { user: { id: 'dummy-user-id' } };
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
 export async function GET({ params }: { params: { recipeId: string } }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const recipe = await getRecipeById(params.recipeId);
 
@@ -29,6 +36,12 @@ export async function POST(
   request: Request,
   { params }: { params: { recipeId: string } }
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     // レシピIDから使用食材を取得
     const ingredients = await getRecipeIngredients(params.recipeId);
@@ -71,11 +84,11 @@ export async function DELETE(
   request: Request,
   { params }: { params: { recipeId: string } }
 ) {
-  // const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
-  // if (!session || !session.user) {
-  //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  // }
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   try {
     await deleteRecipe(params.recipeId, session.user.id);
@@ -84,6 +97,41 @@ export async function DELETE(
     console.error('Error deleting recipe:', error);
     return NextResponse.json(
       { error: 'Failed to delete recipe' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: { recipeId: string } }
+) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { used } = await request.json();
+
+    if (typeof used !== 'boolean') {
+      return NextResponse.json(
+        { error: 'Invalid request. "used" field must be a boolean.' },
+        { status: 400 }
+      );
+    }
+
+    await updateRecipeUsedStatus(params.recipeId, used);
+
+    return NextResponse.json({
+      success: true,
+      message: `Recipe marked as ${used ? 'used' : 'not used'}`,
+    });
+  } catch (error) {
+    console.error('Error updating recipe used status:', error);
+    return NextResponse.json(
+      { error: 'Failed to update recipe used status' },
       { status: 500 }
     );
   }

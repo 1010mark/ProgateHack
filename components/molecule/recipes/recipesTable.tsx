@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils';
 import { Recipe } from '@/types/recipes';
 import { RecipesModal } from './recipesDetailModal';
 import { Button } from '@/components/ui/button';
+import { useShowDialog } from '@/hooks/useShowDialog';
+import { updateRecipeUsedStatus } from '@/lib/api/recipes';
 
 interface RecipesTableProps {
   recipes: Recipe[];
@@ -34,6 +36,7 @@ const statusColor = (recipe: Recipe) => {
 
 export const RecipesTable = ({ recipes, onRemove }: RecipesTableProps) => {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const showDialog = useShowDialog();
 
   const handleRemove = (id: string) => {
     if (onRemove) {
@@ -51,9 +54,26 @@ export const RecipesTable = ({ recipes, onRemove }: RecipesTableProps) => {
     setSelectedRecipe(null);
   };
 
-  const useIngredientFromRecipe = () => {
+  const useIngredientFromRecipe = async () => {
     //TODO ここに処理を追加
+    const confirm = await showDialog({
+      title: 'レシピの使用',
+      content: 'このレシピを使用しますか？',
+    });
+
+    if (!confirm) {
+      return;
+    } else {
+      try {
+        if (selectedRecipe) {
+          await updateRecipeUsedStatus(selectedRecipe.id, true);
+        }
+      } catch {
+        console.error('レシピの使用に失敗しました');
+      }
+    }
     closeModal();
+    window.location.reload();
   };
 
   const formatDate = (date: Date) => {
@@ -116,20 +136,29 @@ export const RecipesTable = ({ recipes, onRemove }: RecipesTableProps) => {
                 </Button>
               </TableCell>
               <TableCell className='flex gap-2 items-center justify-center'>
-                <Button
-                  className={cn(
-                    'px-3 py-1 rounded-md',
-                    isViewable(recipe.status)
-                      ? 'bg-blue-500 text-white hover:bg-blue-600 cursor-pointer'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  )}
-                  onClick={useIngredientFromRecipe}
-                >
-                  使用
-                </Button>
+                {recipe.used ? (
+                  <Button
+                    className={cn(
+                      'px-3 py-1 rounded-md w-18',
+                      'bg-gray-300 text-white hover:bg-gray-300 cursor-not-allowed'
+                    )}
+                  >
+                    使用済み
+                  </Button>
+                ) : (
+                  <Button
+                    className={cn(
+                      'px-3 py-1 rounded-md bg-green-600 text-white hover:bg-green-600 cursor-not-allowed w-18'
+                    )}
+                  >
+                    未使用
+                  </Button>
+                )}
                 <button
                   className='round-button click-transition cursor-pointer'
-                  onClick={() => handleRemove(recipe.id)}
+                  onClick={() => {
+                    handleRemove(recipe.id);
+                  }}
                 >
                   <Image
                     src='/icons/ui/close.png'
