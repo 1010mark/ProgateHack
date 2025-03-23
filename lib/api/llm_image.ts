@@ -69,10 +69,10 @@ export async function callLLMwithImage(
               sourceType: "BYTE_CONTENT",
               byteContent: {
                 mediaType: "image/jpeg",
-                data: Buffer.from(imageBase64, 'base64')
+                data: new Uint8Array(Buffer.from(imageBase64, 'base64'))
               }
-            },
-            useCase: "CHAT"
+            } as const,
+            useCase: "CHAT" as const
           }]
         }
       });
