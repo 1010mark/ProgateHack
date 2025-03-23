@@ -60,3 +60,30 @@ export async function deleteRecipe(
     throw error;
   }
 }
+export async function updateRecipeUsedStatus(
+  recipeId: string,
+  used: boolean
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetch(`/api/recipes/${recipeId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ used }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(
+      `Failed to update used status for recipe ${recipeId}:`,
+      error
+    );
+    throw error;
+  }
+}
