@@ -132,7 +132,7 @@ export async function generateIngredientsFromImage(
 ): Promise<RawIngredient[]> {
   const basePrompt = `
 あなたは食材画像認識AIです。あなたのタスクは画像に写っている食材をすべて列挙することです。食材のみを挙げてください。 レスポンスは以下のIngredient型の配列で返してください。
-\`\`\`typescript
+
 export type Unit = '個' | 'g' | 'ml' | '束' | '本' | '枚' | 'パック';
 
 export type IngredientCategory =
@@ -152,7 +152,7 @@ export interface Ingredient {
   category: IngredientCategory;
   notes?: string; // メモ
 }
-\`\`\`
+
 例） [ { name: '玉ねぎ', quantity: 2, unit: '個', expirationDate: new Date(2025, 3, 30), category: '野菜', notes: '常温保存' }, { name: 'にんじん', quantity: 3, unit: '本', expirationDate: new Date(2025, 3, 30), category: '野菜' }, { name: '牛肉', quantity: 300, unit: 'g', expirationDate: new Date(2025, 3, 25), category: '肉', notes: '冷蔵保存' }, { name: '鶏もも肉', quantity: 500, unit: 'g', expirationDate: new Date(2025, 3, 26), category: '肉' }, { name: '卵', quantity: 6, unit: '個', expirationDate: new Date(2025, 4, 6), category: '卵' }]
 
 なお、食材以外の内容を返す必要はありません。必ず配列のみを返してください。また、食材が写っていない場合は空の配列を返してください。
