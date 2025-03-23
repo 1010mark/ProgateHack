@@ -3,6 +3,8 @@ import {
   InvokeAgentCommand,
 } from '@aws-sdk/client-bedrock-agent-runtime';
 import { Ingredient } from '@/types/ingredients';
+import sharp from 'sharp';
+import PDFDocument from 'pdfkit';
 
 export type RawIngredient = Omit<Ingredient, 'id'>;
 
@@ -18,6 +20,47 @@ const initializeAWSClient = () => {
     credentials: credentials,
   });
 };
+
+/**
+ * Base64エンコードされた画像データをPDFに変換する
+ * @param imageBase64 Base64エンコードされた画像データ
+ * @returns PDFのバイトデータ
+ */
+async function convertImageToPDF(imageBase64: string): Promise<Uint8Array> {
+  // Base64デコード
+  const imageBuffer = Buffer.from(imageBase64, 'base64');
+  
+  // 画像を処理
+  const processedImage = await sharp(imageBuffer)
+    .resize(800, 600, { fit: 'inside' }) // サイズを調整
+    .toBuffer();
+
+  // PDFドキュメントを作成
+  const doc = new PDFDocument();
+  const chunks: Buffer[] = [];
+
+  // PDFデータを収集
+  doc.on('data', (chunk) => chunks.push(chunk));
+  
+  // 画像をPDFに追加
+  doc.image(processedImage, {
+    fit: [500, 400],
+    align: 'center',
+    valign: 'center'
+  });
+
+  // PDFを生成
+  doc.end();
+
+  // PromiseでPDFデータを待機
+  return new Promise((resolve, reject) => {
+    doc.on('end', () => {
+      const pdfBuffer = Buffer.concat(chunks);
+      resolve(new Uint8Array(pdfBuffer));
+    });
+    doc.on('error', reject);
+  });
+}
 
 /**
  * 文字列を配列として解釈する
@@ -57,6 +100,10 @@ export async function callLLMwithImage(
     try {
       const client = initializeAWSClient();
       const sessionId = Date.now().toString();
+
+      // 画像をPDFに変換
+      const pdfData = await convertImageToPDF(imageBase64);
+
       const command = new InvokeAgentCommand({
         agentId: process.env.NEXT_PUBLIC_AWS_AGENTID,
         agentAliasId: process.env.NEXT_PUBLIC_AWS_AGENT_ALIASID,
@@ -64,12 +111,12 @@ export async function callLLMwithImage(
         inputText: prompt,
         sessionState: {
           files: [{
-            name: "image.txt",
+            name: "image.pdf",
             source: {
               sourceType: "BYTE_CONTENT",
               byteContent: {
-                mediaType: "text/plain",
-                data: new TextEncoder().encode(imageBase64)
+                mediaType: "application/pdf",
+                data: pdfData
               }
             } as const,
             useCase: "CHAT" as const
