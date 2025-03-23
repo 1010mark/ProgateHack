@@ -64,12 +64,12 @@ export async function callLLMwithImage(
         inputText: prompt,
         sessionState: {
           files: [{
-            name: "image.jpg",
+            name: "image.txt",
             source: {
               sourceType: "BYTE_CONTENT",
               byteContent: {
-                mediaType: "image/jpeg",
-                data: new Uint8Array(Buffer.from(imageBase64, 'base64'))
+                mediaType: "text/plain",
+                data: new TextEncoder().encode(imageBase64)
               }
             } as const,
             useCase: "CHAT" as const
@@ -131,7 +131,7 @@ export async function generateIngredientsFromImage(
   additionalPrompt?: string
 ): Promise<RawIngredient[]> {
   const basePrompt = `
-あなたは食材画像認識AIです。あなたのタスクは画像に写っている食材をすべて列挙することです。食材のみを挙げてください。 レスポンスは以下のIngredient型の配列で返してください。
+あなたは食材画像認識AIです。あなたのタスクは画像に写っている食材をすべて列挙することです。食材のみを挙げてください。まず、添付しているtxtをjpegのbase64として認識してください。そして画像を認識して、食材を返してください。レスポンスは以下のIngredient型の配列で返してください。
 
 export type Unit = '個' | 'g' | 'ml' | '束' | '本' | '枚' | 'パック';
 
