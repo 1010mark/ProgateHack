@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: 'Last Bite',
   description: 'your helper in the kitchen',
   icons: {
-    icon: '/app_icon.jpg',
+    icon: '/app_icon.png',
   },
 };
 
