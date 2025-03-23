@@ -151,7 +151,7 @@ export async function updateStatistics(userId: string): Promise<Statistics> {
 /**
  * 過去30日間の食材使用トレンドを取得する
  * @param userId ユーザーID
- * @returns 日付ごとの食材使用回数の配列
+ * @returns 日付ごとの食材使用回数の配列（MM-DD 表示）
  */
 export async function getUsageTrends(userId: string): Promise<UsageTrend[]> {
   const query = `
@@ -163,29 +163,45 @@ export async function getUsageTrends(userId: string): Promise<UsageTrend[]> {
     GROUP BY DATE_TRUNC('day', used_at)
     ORDER BY date ASC
   `;
-  
-  const result = await pool.query(query, [userId]);
-  const trends: UsageTrend[] = result.rows.map((row: any) => ({
-    date: row.date,
-    usageCount: parseInt(row.usage_count),
-  }));
 
-  // Get the last 30 days
+  const result = await pool.query(query, [userId]);
+
+  const formatDate = (date: Date): string =>
+    date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
+
   const today = new Date();
   const last30Days = Array.from({ length: 30 }, (_, i) => {
     const date = new Date(today);
-    date.setDate(today.getDate() - (30 - i)); // Last 30 days
-    return `${date.getMonth() + 1}/${date.getDate()}`;
+    date.setDate(today.getDate() - (29 - i));
+    return formatDate(date);
   });
 
-  // Fill missing days with zero usageCount
+  // dummy data（usageCount: 1~10）
+  if (result.rows.length === 0) {
+    const dummyData: UsageTrend[] = last30Days.map((date) => ({
+      date,
+      usageCount: Math.floor(Math.random() * 5) + 1, // 1~10
+    }));
+    return dummyData;
+  }
+
+  const trends: UsageTrend[] = result.rows.map((row: any) => ({
+    date: formatDate(new Date(row.date)),
+    usageCount: parseInt(row.usage_count),
+  }));
+
   const filledTrends: UsageTrend[] = last30Days.map((date) => {
     const existingTrend = trends.find((trend) => trend.date === date);
-    return existingTrend ? existingTrend : { date, usageCount: 0 };
+    return existingTrend ? existingTrend : {
+      date,
+      usageCount: 0,
+    };
   });
 
   return filledTrends;
 }
+
+
 
 
 /**
@@ -198,7 +214,6 @@ export async function getPopularIngredients(
   userId: string,
   limit: number = 10
 ): Promise<PopularIngredient[]> {
-  // 実際のデータベースクエリバージョン
   const query = `
     SELECT name, COUNT(*) AS usage_count
     FROM user_ingredients
@@ -210,27 +225,32 @@ export async function getPopularIngredients(
   `;
   
   const result = await pool.query(query, [userId, limit]);
-  return result.rows.map((row: any) => ({
-    name: row.name,
-    usageCount: parseInt(row.usage_count),
+
+  if (result.rows.length > 0) {
+    return result.rows.map((row: any) => ({
+      name: row.name,
+      usageCount: parseInt(row.usage_count),
+    }));
+  }
+
+  // dummy data
+  const dummyIngredients = [
+    'トマト', '玉ねぎ', 'にんにく', '豚肉', 'じゃがいも',
+    'にんじん', '鶏肉', 'ブロッコリー', 'ピーマン', 'きのこ',
+    'キャベツ', 'なす', '豆腐', '白菜', 'ベーコン',
+  ];
+
+  const shuffled = dummyIngredients.sort(() => 0.5 - Math.random());
+  const dummyData: PopularIngredient[] = shuffled.slice(0, limit).map(name => ({
+    name,
+    usageCount: Math.floor(Math.random() * 20) + 1, // 1~20
   }));
 
-  // シミュレーションバージョン
-  console.log('よく使われる食材を取得中:', userId, 'limit:', limit);
+  dummyData.sort((a, b) => b.usageCount - a.usageCount);
 
-  return [
-    { name: 'トマト', usageCount: 15 },
-    { name: '玉ねぎ', usageCount: 12 },
-    { name: 'にんにく', usageCount: 10 },
-    { name: '豚肉', usageCount: 8 },
-    { name: 'じゃがいも', usageCount: 7 },
-    { name: 'にんじん', usageCount: 6 },
-    { name: '鶏肉', usageCount: 5 },
-    { name: 'ブロッコリー', usageCount: 4 },
-    { name: 'ピーマン', usageCount: 3 },
-    { name: 'きのこ', usageCount: 2 },
-  ].slice(0, limit);
+  return dummyData;
 }
+
 
 /**
  * 食材のカテゴリー別割合を取得する

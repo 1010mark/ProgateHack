@@ -16,8 +16,8 @@ export default function UserDashboardRankList() {
     const loadRankData = async () => {
       try {
         setIsLoading(true);
-        // デフォルトで5件の人気食材を取得
-        const data = await fetchPopularIngredients(5);
+        // デフォルトで8件の人気食材を取得
+        const data = await fetchPopularIngredients(8);
         setRankData(data);
         setError(null);
       } catch (err) {
