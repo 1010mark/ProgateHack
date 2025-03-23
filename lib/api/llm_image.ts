@@ -36,20 +36,24 @@ async function convertImageToPDF(imageBase64: string): Promise<Uint8Array> {
     .toBuffer();
 
   // PDFドキュメントを作成
-  const doc = new PDFDocument();
+  const doc = new PDFDocument({
+    autoFirstPage: true,
+    size: 'A4',
+    bufferPages: true
+  });
   const chunks: Buffer[] = [];
 
   // PDFデータを収集
-  doc.on('data', (chunk) => chunks.push(chunk));
+  doc.on('data', (chunk: Buffer) => chunks.push(chunk));
   
-  // 画像をPDFに追加
+  // 画像をPDFに追加（テキストを使用しない）
   doc.image(processedImage, {
     fit: [500, 400],
     align: 'center',
     valign: 'center'
   });
 
-  // PDFを生成
+  // テキストを使用しないため、フォントは不要
   doc.end();
 
   // PromiseでPDFデータを待機
