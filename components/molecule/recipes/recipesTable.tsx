@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { Recipe } from '@/types/recipes';
 import { RecipesModal } from './recipesDetailModal';
 import { Button } from '@/components/ui/button';
+import { useShowDialog } from '@/hooks/useShowDialog';
 
 interface RecipesTableProps {
   recipes: Recipe[];
@@ -34,6 +35,7 @@ const statusColor = (recipe: Recipe) => {
 
 export const RecipesTable = ({ recipes, onRemove }: RecipesTableProps) => {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const showDialog = useShowDialog();
 
   const handleRemove = (id: string) => {
     if (onRemove) {
@@ -51,8 +53,13 @@ export const RecipesTable = ({ recipes, onRemove }: RecipesTableProps) => {
     setSelectedRecipe(null);
   };
 
-  const useIngredientFromRecipe = () => {
+  const useIngredientFromRecipe = async () => {
     //TODO ここに処理を追加
+    const confirm = await showDialog({
+      title: 'レシピの使用',
+      content: 'このレシピを使用しますか？',
+    });
+
     closeModal();
   };
 

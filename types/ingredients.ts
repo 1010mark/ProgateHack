@@ -37,5 +37,6 @@ export type IngredientCategory =
   | '肉'
   | '魚'
   | '卵'
+  | '雑穀'
   | '冷凍食品'
   | 'その他';

@@ -18,12 +18,14 @@ interface CartFilterProps {
   onApplyFilter: (filterParams: any) => void;
   hasIngredients: boolean;
   ingredients: any[]; // Add ingredients prop to access cart items
+  clearAll: () => void;
 }
 
 export const CartFilter = ({
   onApplyFilter,
   hasIngredients,
   ingredients,
+  clearAll,
 }: CartFilterProps) => {
   const [peopleCount, setPeopleCount] = useState<number>(1);
   const [mealPreference, setMealPreference] = useState<string>('');
@@ -98,7 +100,7 @@ export const CartFilter = ({
     try {
       setIsLoading(true);
       setApiError(null);
-      
+
       // Prepare the request payload according to RecipeSuggestionRequest
       const requestData = {
         peopleCount,
@@ -107,14 +109,14 @@ export const CartFilter = ({
         allergies: allergies.length > 0 ? allergies : undefined,
         recipesName,
         otherConditions: otherConditions || undefined,
-        ingredients: ingredients.map(item => ({
+        ingredients: ingredients.map((item) => ({
           id: item.id,
           name: item.name,
           quantity: item.quantity,
-          unit: item.unit
-        }))
+          unit: item.unit,
+        })),
       };
-      
+
       // Make API request
       const response = await fetch('/api/recipes', {
         method: 'POST',
@@ -123,17 +125,19 @@ export const CartFilter = ({
         },
         body: JSON.stringify(requestData),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'レシピの提案に失敗しました');
       }
-      
+
       // Show success message
-      setAlertMessage('レシピの提案が完了しました。生成中のレシピはマイレシピから確認できます。');
+      setAlertMessage(
+        'レシピの提案が完了しました。生成中のレシピはマイレシピから確認できます。'
+      );
       setIsAlertOpen(true);
-      
+
       // Call the original filter function for any additional client-side filtering
       onApplyFilter({
         peopleCount,
@@ -143,13 +147,13 @@ export const CartFilter = ({
         recipesName,
         otherConditions,
       });
-      
     } catch (error) {
       console.error('Recipe suggestion error:', error);
       setApiError((error as Error).message);
       setAlertMessage(`エラーが発生しました: ${(error as Error).message}`);
       setIsAlertOpen(true);
     } finally {
+      clearAll();
       setIsLoading(false);
     }
   };

@@ -26,7 +26,7 @@ export const RecipesModal = ({
   };
 
   return (
-    <div className='fixed inset-0 flex items-center justify-center z-50'>
+    <div className='fixed inset-0 flex items-center justify-center z-20'>
       <div
         className='absolute inset-0 bg-black opacity-50'
         onClick={onClose}
@@ -44,7 +44,7 @@ export const RecipesModal = ({
               <p className='text-sm text-gray-500'>
                 作成日時: {formatDate(recipe.createdAt)}
               </p>
-              <h2 className='text-2xl font-bold'>{recipe.name}</h2>
+              <h2 className='text-2xl font-bold'>{recipe.recipesName}</h2>
             </div>
           </div>
         </div>
